@@ -1,29 +1,49 @@
 #include "Crop.h"
+#include <algorithm>
 
-Crop::Crop() : name(""), growthTime(0), currentAge(0), stage(CropStage::SEED), isWithered(false), witherThreshold(0), isWatered(false), waterTicksRemaining(0) {}
+CropVariety::CropVariety() 
+    : growthTime(100), season(CropSeason::ALL), seedCost(10), harvestYield(25), 
+      waterBonus(1.5f), isRare(false) {}
+
+Crop::Crop() 
+    : name(""), varietyName(""), growthTime(0), currentAge(0), stage(CropStage::SEED), 
+      isWithered(false), witherThreshold(0), isWatered(false), waterTicksRemaining(0),
+      quality(1), soilNutrientConsumption(1.0f), season(CropSeason::ALL),
+      isCompanionBoosted(false), crossbreedGeneration(0) {}
 
 Crop::Crop(std::string n, int totalGrowthTime)
-    : name(n), growthTime(totalGrowthTime), currentAge(0), stage(CropStage::SEED), isWithered(false), witherThreshold(totalGrowthTime * 3), isWatered(false), waterTicksRemaining(0) {
+    : name(n), varietyName(n), growthTime(totalGrowthTime), currentAge(0), stage(CropStage::SEED), 
+      isWithered(false), witherThreshold(totalGrowthTime * 3), isWatered(false), waterTicksRemaining(0),
+      quality(1), soilNutrientConsumption(1.0f), season(CropSeason::ALL),
+      isCompanionBoosted(false), crossbreedGeneration(0) {
     updateStage();
 }
 
-void Crop::grow() {
+Crop::Crop(std::string n, std::string variety, int totalGrowthTime)
+    : name(n), varietyName(variety), growthTime(totalGrowthTime), currentAge(0), stage(CropStage::SEED), 
+      isWithered(false), witherThreshold(totalGrowthTime * 3), isWatered(false), waterTicksRemaining(0),
+      quality(1), soilNutrientConsumption(1.0f), season(CropSeason::ALL),
+      isCompanionBoosted(false), crossbreedGeneration(1) {
+    updateStage();
+}
+
+void Crop::grow(float soilMultiplier) {
     if (isWithered) return;
     if (isWatered) {
-        growWithWaterBonus();
+        growWithWaterBonus(soilMultiplier);
     } else {
         if (currentAge < growthTime) {
-            currentAge++;
+            currentAge += static_cast<int>(soilMultiplier);
             updateStage();
         } else if (currentAge < witherThreshold) {
-            currentAge++;
+            currentAge += static_cast<int>(soilMultiplier);
         } else {
             wither();
         }
     }
 }
 
-void Crop::growWithWaterBonus() {
+void Crop::growWithWaterBonus(float soilMultiplier) {
     if (isWithered) return;
     if (waterTicksRemaining > 0) {
         waterTicksRemaining--;
@@ -31,11 +51,15 @@ void Crop::growWithWaterBonus() {
             isWatered = false;
         }
     }
+    float growthAmount = 1.5f * soilMultiplier;
+    if (isCompanionBoosted) {
+        growthAmount *= 1.2f;
+    }
     if (currentAge < growthTime) {
-        currentAge += 1.5;
+        currentAge += static_cast<int>(growthAmount);
         updateStage();
     } else if (currentAge < witherThreshold) {
-        currentAge += 1.5;
+        currentAge += static_cast<int>(growthAmount);
     } else {
         wither();
     }
@@ -82,4 +106,26 @@ std::string Crop::getStageName() const {
         case CropStage::WITHERED: return "Withered";
         default: return "Unknown";
     }
+}
+
+int Crop::calculateYield() const {
+    if (!isReady()) return 0;
+    int baseYield = 1;
+    float qualityMultiplier = 1.0f + (quality - 1) * 0.1f;
+    float companionMultiplier = isCompanionBoosted ? 1.15f : 1.0f;
+    return static_cast<int>(baseYield * qualityMultiplier * companionMultiplier);
+}
+
+void Crop::applyCompanionBoost() {
+    isCompanionBoosted = true;
+    quality = std::min(5, quality + 1);
+}
+
+bool Crop::tryCrossbreed(const Crop& other) {
+    if (!isReady() || !other.isReady()) return false;
+    if (name != other.name) return false;
+    
+    crossbreedGeneration = std::max(crossbreedGeneration, other.crossbreedGeneration) + 1;
+    quality = std::min(5, std::max(quality, other.quality) + 1);
+    return true;
 }

@@ -48,7 +48,7 @@ int main() {
     bridge.init();
     
     std::cout << "Viby Farming Simulator - Desktop Mode" << std::endl;
-    std::cout << "Grid: " << Farm::GRID_WIDTH << "x" << Farm::GRID_HEIGHT << std::endl;
+    std::cout << "Grid: " << Farm::BASE_GRID_WIDTH << "x" << Farm::BASE_GRID_HEIGHT << std::endl;
     
     if (bridge.plantSeed(0, 0, "Carrot")) {
         std::cout << "Planted Carrot at 0,0" << std::endl;

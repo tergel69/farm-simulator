@@ -14,6 +14,12 @@ add_library(farm-core STATIC
     cpp-core/src/Crop.cpp
     cpp-core/src/Farm.cpp
     cpp-core/src/FarmBridge.cpp
+    cpp-core/src/Soil.cpp
+    cpp-core/src/NPC.cpp
+    cpp-core/src/Mine.cpp
+    cpp-core/src/Fishing.cpp
+    cpp-core/src/Building.cpp
+    cpp-core/src/World.cpp
 )
 
 target_include_directories(farm-core PUBLIC
