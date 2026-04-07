@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "name": "viby-farming-simulator",
+  "workspaces": [
+    "react-ui"
+  ],
+  "scripts": {
+    "game": "node ./scripts/dev-game.mjs",
+    "game:skip-wasm": "node ./scripts/dev-game.mjs --skip-wasm",
+    "wasm:build": "node ./scripts/build-wasm.mjs",
+    "dev": "npm run dev --workspace react-ui",
+    "build": "npm run build --workspace react-ui",
+    "preview": "npm run preview --workspace react-ui"
+  }
+}
