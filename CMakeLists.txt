@@ -20,6 +20,8 @@ add_library(farm-core STATIC
     cpp-core/src/Fishing.cpp
     cpp-core/src/Building.cpp
     cpp-core/src/World.cpp
+    cpp-core/src/Biome.cpp
+    cpp-core/src/WorldOpenWorld.cpp
 )
 
 target_include_directories(farm-core PUBLIC
@@ -39,7 +41,7 @@ if(BUILD_FOR_WEB)
             -s MODULARIZE=1 \
             -s EXPORT_NAME='createModule' \
             -s ALLOW_MEMORY_GROWTH=1 \
-            -s EXPORTED_FUNCTIONS='[\"_initGame\",\"_updateWorld\",\"_plantSeed\",\"_harvestCrop\",\"_clearWitheredCrop\",\"_getGameStateJson\"]' \
+            -s EXPORTED_FUNCTIONS='[\"_initGame\",\"_updateWorld\",\"_plantSeed\",\"_harvestCrop\",\"_clearWitheredCrop\",\"_getGameStateJson\",\"_travelToBiome\",\"_getWorldMapJson\",\"_setWaypoint\"]' \
             -s EXPORTED_RUNTIME_METHODS='[\"ccall\",\"cwrap\"]' \
             -s NO_EXIT_RUNTIME=1 \
             -s ENVIRONMENT='web' \
