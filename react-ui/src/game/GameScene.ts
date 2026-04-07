@@ -1,8 +1,10 @@
 import * as THREE from 'three';
+import { EffectComposer, RenderPass } from 'postprocessing';
+import { PixelationEffect, EffectPass } from 'postprocessing';
 import { createFarmPlot, updateCropVisual, setPlotWatered, updateWindAnimation } from './FarmPlot3D';
 import { createPlayer, updatePlayerAnimation, movePlayerTo } from './Player3D';
 import { createEnvironment } from './Environment3D';
-import { CameraController } from './CameraController';
+import { CameraController, type CameraMode } from './CameraController';
 import { createDayNightCycle, updateDayNightCycle, createWeatherSystem, updateWeatherSystem, setRain } from './WeatherAndDay';
 import { EffectManager } from './EffectManager';
 import { createChicken, createCow, updateAnimal, collectProduct, type Animal3D } from './Animals3D';
@@ -10,6 +12,13 @@ import { createPond, createFishingRod, type FishingRod3D, type FishType } from '
 import { createDog, createCat,  type Pet3D } from './Pet3D';
 import type { FarmPlot3D, Player3D, Environment3D, WeatherSystem, DayNightCycle, SeasonSettings } from './types3d';
 import type { FarmState } from '../bridge/types';
+
+export type PixelStylePreset = 'subtle' | 'balanced' | 'heavy';
+
+export interface VisualSettings {
+  cameraMode: CameraMode;
+  pixelStyle: PixelStylePreset;
+}
 
 const GRID_WIDTH = 10;
 const GRID_HEIGHT = 10;
@@ -44,6 +53,13 @@ export class GameScene {
   pond: THREE.Group | null;
   fishingRod: FishingRod3D;
   pets: Pet3D[];
+  
+  // Post-processing
+  composer: EffectComposer | null = null;
+  renderPass: RenderPass | null = null;
+  pixelationPass: PixelationPass | null = null;
+  resolutionScale: number = 1.0;
+  currentPixelStyle: PixelStylePreset = 'balanced';
 
   constructor(container: HTMLElement) {
     this.scene = new THREE.Scene();
@@ -133,6 +149,30 @@ export class GameScene {
 
     this.setupInputHandlers();
     this.isInitialized = true;
+  }
+
+  setupPostProcessing(pixelStyle: PixelStylePreset) {
+    if (this.composer) {
+      this.composer.dispose();
+      this.composer = null;
+    }
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const scales: Record<PixelStylePreset, number> = { subtle: 0.75, balanced: 0.5, heavy: 0.25 };
+    this.resolutionScale = scales[pixelStyle];
+    this.composer = new EffectComposer(this.renderer, { multisampling: 0 });
+    this.renderPass = new RenderPass(this.scene, this.cameraController.camera);
+    this.composer.addPass(this.renderPass);
+    this.pixelationPass = new PixelationPass({ granularity: 16, resolution: new THREE.Vector2(Math.floor(width * this.resolutionScale), Math.floor(height * this.resolutionScale)) });
+    this.composer.addPass(this.pixelationPass);
+    this.currentPixelStyle = pixelStyle;
+  }
+
+  applyVisualSettings(settings: VisualSettings) {
+    this.cameraController.setCameraMode(settings.cameraMode);
+    if (settings.pixelStyle !== this.currentPixelStyle) {
+      this.setupPostProcessing(settings.pixelStyle);
+    }
   }
 
   createSkybox(): THREE.Mesh {
@@ -549,12 +589,30 @@ export class GameScene {
       }
     }
 
-    this.renderer.render(this.scene, this.cameraController.camera);
+    // Use composer for post-processing if available, otherwise direct render
+    if (this.composer && this.composer.passes.length > 0) {
+      this.composer.render();
+    } else {
+      this.renderer.render(this.scene, this.cameraController.camera);
+    }
   }
 
   resize() {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.cameraController.onResize();
+    
+    // Update composer resolution on resize
+    if (this.composer) {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      this.composer.setSize(width, height);
+      if (this.pixelationPass) {
+        this.pixelationPass.resolution.set(
+          Math.floor(width * this.resolutionScale),
+          Math.floor(height * this.resolutionScale)
+        );
+      }
+    }
   }
 
   dispose() {

@@ -823,6 +823,28 @@ body {
     text-align: right;
   }
 
+  .setting-select {
+    background: linear-gradient(135deg, #f0e6d2 0%, #d4c5a9 100%);
+    border: 2px solid var(--gold);
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-family: "Press Start 2P", monospace;
+    font-size: 8px;
+    color: #4a3728;
+    cursor: pointer;
+    outline: none;
+    min-width: 150px;
+  }
+
+  .setting-select:hover {
+    border-color: #ffd700;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+  }
+
+  .setting-select:focus {
+    border-color: #ffd700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+  }
   .settings-buttons {
     display: flex;
     gap: 8px;

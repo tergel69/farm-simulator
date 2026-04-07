@@ -1,51 +1,39 @@
 ```
+# TypeScript/JavaScript build artifacts
+tsconfig.tsbuildinfo
+
 # Dependencies
 node_modules/
 
-# Build artifacts
-dist/
-build/
-target/
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-.python-version
-
-# C++
-*.o
-*.obj
-*.exe
-*.dll
-*.so
-*.a
-*.lib
-*.dylib
-*.plist
-
-# Logs
+# Logs and temp files
 *.log
+*.tmp
 
-# Environment
+# Environment variables
 .env
 .env.local
-.env.*
+*.env.*
 
-# Editors
+# Editor/IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS
-.DS_Store
-Thumbs.db
+# Build outputs
+dist/
+build/
+coverage/
+htmlcov/
+*.out
+
+# Python artifacts (if any Python files exist in the project)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.Python
 
 # Compressed files
 *.zip
@@ -71,9 +59,48 @@ Thumbs.db
 *.tar.xz
 *.tar.zst
 
-# Coverage
-coverage/
-htmlcov/
-.coverage
+# System files
+.DS_Store
+Thumbs.db
 
+# Testing
+.mypy_cache/
+.pytest_cache/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Package managers
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+lib-cov
+coverage/
+
+# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
+.grunt
+
+# Bower dependency directory (https://bower.io/)
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# TypeScript cache and compiled output
+*.tsbuildinfo
 ```

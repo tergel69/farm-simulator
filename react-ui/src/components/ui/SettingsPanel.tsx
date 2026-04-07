@@ -1,13 +1,15 @@
 import { useGameStore } from '../../store/gameStore';
 import { audioSystem } from '../../store/audioSystem';
 import { loadGame } from '../../store/saveSystem';
+import type { GameScene } from '../../game/GameScene';
 
 interface SettingsPanelProps {
   onClose: () => void;
   onSave: () => void;
+  gameSceneRef: React.RefObject<GameScene | null>;
 }
 
-export function SettingsPanel({ onClose, onSave }: SettingsPanelProps) {
+export function SettingsPanel({ onClose, onSave, gameSceneRef }: SettingsPanelProps) {
   const { settings, setSettings, coins, xp, level, achievements, totalHarvests, totalPlantings, totalEarnings } = useGameStore();
 
   const handleMusicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,6 +28,28 @@ export function SettingsPanel({ onClose, onSave }: SettingsPanelProps) {
     const val = parseFloat(e.target.value);
     setSettings({ ambientVolume: val });
     audioSystem.setAmbientVolume(val);
+  };
+
+  const handleCameraModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value as 'fixed_isometric' | 'free';
+    setSettings({ cameraMode: val });
+    if (gameSceneRef.current) {
+      gameSceneRef.current.applyVisualSettings({
+        cameraMode: val,
+        pixelStyle: settings.pixelStyle
+      });
+    }
+  };
+
+  const handlePixelStyleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value as 'subtle' | 'balanced' | 'heavy';
+    setSettings({ pixelStyle: val });
+    if (gameSceneRef.current) {
+      gameSceneRef.current.applyVisualSettings({
+        cameraMode: settings.cameraMode,
+        pixelStyle: val
+      });
+    }
   };
 
   const handleLoad = () => {
@@ -66,6 +90,25 @@ export function SettingsPanel({ onClose, onSave }: SettingsPanelProps) {
             <label>🌿 Ambient</label>
             <input type="range" min="0" max="1" step="0.05" value={settings.ambientVolume} onChange={handleAmbientChange} />
             <span>{Math.round(settings.ambientVolume * 100)}%</span>
+          </div>
+        </div>
+
+        <div className="settings-section">
+          <h3>🎨 Visual</h3>
+          <div className="setting-row">
+            <label>📷 Camera Mode</label>
+            <select value={settings.cameraMode} onChange={handleCameraModeChange} className="setting-select">
+              <option value="fixed_isometric">Fixed Isometric (Recommended)</option>
+              <option value="free">Free Camera</option>
+            </select>
+          </div>
+          <div className="setting-row">
+            <label>👾 Pixel Style</label>
+            <select value={settings.pixelStyle} onChange={handlePixelStyleChange} className="setting-select">
+              <option value="subtle">Subtle (75% resolution)</option>
+              <option value="balanced">Balanced (50% resolution)</option>
+              <option value="heavy">Heavy (25% resolution)</option>
+            </select>
           </div>
         </div>
 
