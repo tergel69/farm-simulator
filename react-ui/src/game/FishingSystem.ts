@@ -56,7 +56,7 @@ export function getRandomFish(timeOfDay: 'day' | 'night', isRaining: boolean): F
 export interface FishingRod3D {
   group: THREE.Group;
   line: THREE.Line | null;
-  bobber: THREE.Mesh | null;
+  bobber: THREE.Group | null;
   isCasting: boolean;
   isWaiting: boolean;
   isReeling: boolean;
@@ -184,7 +184,7 @@ export function createPond(): THREE.Group {
   return group;
 }
 
-export function createBobber(): THREE.Mesh {
+export function createBobber(): THREE.Group {
   const group = new THREE.Group();
 
   const bottomGeo = new THREE.SphereGeometry(0.08, 8, 6, 0, Math.PI * 2, 0, Math.PI / 2);
