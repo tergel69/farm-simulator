@@ -9,6 +9,8 @@ export interface GameSettings {
   ambientVolume: number;
   showTutorial: boolean;
   graphicsQuality: "low" | "medium" | "high";
+  cameraMode: "fixed_isometric" | "free";
+  pixelStyle: "subtle" | "balanced" | "heavy";
 }
 
 export interface SaveData {
@@ -31,6 +33,8 @@ export const DEFAULT_SETTINGS: GameSettings = {
   ambientVolume: 0.4,
   showTutorial: true,
   graphicsQuality: "high",
+  cameraMode: "fixed_isometric",
+  pixelStyle: "balanced",
 };
 
 export const ACHIEVEMENTS = {
